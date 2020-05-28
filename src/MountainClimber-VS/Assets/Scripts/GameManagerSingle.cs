@@ -12,55 +12,69 @@ using UnityEngine.SceneManagement;
 using TMPro;
 public class GameManagerSingle : MonoBehaviour
 {
+    #region Field Declarations 
+    [Header("Reference to Player 1 Object")]
     // References player objects
     public GameObject player1;
 
     // Scores
+    [Space]
+    [Header("Player 1 Scores")]
     public int p1Score = 0;
     // Bonus Scores from breaking crates
     public int p1BonusScore = 0;
 
+    [Space]
+    [Header("References to Main Camera")]
     // References main camera
     public Camera main_cam; // single player view
     public float starting_speed = 0.01f;
 
+    [Space]
+    [Header("Player Constants for Bounds Keeping and Score")]
     // Score offset
     public const float scoreOffset = 5.6f;
-
     // Max distance player can be from cam before being considered out of bounds
     public const float verticalMaxDist = 18.2f;
     public const float horizontalMaxDist = 13.0f;
 
     // UI Mechanics
+    [Space]
+    [Header("UI Mechanics for Player 1")]
     public float secondsTilRestart = 2f;
     public TextMeshProUGUI score1;
     public TextMeshProUGUI countdown;
     public GameObject gameover_ui;
     public TextMeshProUGUI gameover_text;
-    string[] gameover_displays = new string[4] { "Gameover!\nOOOFFFF", "Gameover!\nBetter luck next time :O\n", "!gAmeOVer?\n", "At least you tried :)\n" };
-    int show;
-    private bool gameover;
+    protected string[] gameover_displays = new string[4] { "Gameover!\nOOOFFFF", "Gameover!\nBetter luck next time :O\n", "!gAmeOVer?\n", "At least you tried :)\n" };
+    protected int show;
+    protected bool gameover;
     public TextMeshProUGUI speedup1;
-    public Canvas Bg1;
-
+    public Canvas bg1;
 
     // Countdown
+    [Space]
+    [Header("Countdown")]
     public float counter = 3f;
-    float count_time;
-    bool rearranged = false;
+    protected float count_time;
+    protected bool rearranged = false;
 
     // Crate generation
-    [SerializeField] public Transform crate;
+    [Space]
+    [Header("Crate Generation")]
+    public Transform crate;
     public int chance = 500;
-    private GameObject[] ground;
-    private float crate_offsety = 0.1f;
-    private float crate_offsetx = 1.0f;
-    private int total;
+    protected GameObject[] ground;
+    protected float crate_offsety = 0.1f;
+    protected float crate_offsetx = 1.0f;
+    protected int total;
     public int max_crates = 5;
-
-    // Power up
+    [Space]
+    [Header("Minimum Scroll Speed")]
     public float min_scroll_speed = 0.01f;
+    #endregion
 
+    #region Unity Event Methods
     void Start()
     {
         // Get stuff ready
@@ -127,7 +141,7 @@ public class GameManagerSingle : MonoBehaviour
             main_cam.GetComponent<scroll>().enabled = false;
             // Stop Player 1 movement
             player1.GetComponent<PlayerMovement>().enabled = false;
-            Bg1.enabled = false;
+            bg1.enabled = false;
 
             StartCoroutine(DelayTilRestart());
         }
@@ -200,7 +214,9 @@ public class GameManagerSingle : MonoBehaviour
             }
         }
     }
+    #endregion
 
+    #region Methods
     IEnumerator DelayTilRestart()
     {
         if(!gameover)
@@ -225,4 +241,5 @@ public class GameManagerSingle : MonoBehaviour
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+    #endregion
 }

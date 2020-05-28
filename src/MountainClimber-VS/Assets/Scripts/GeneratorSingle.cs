@@ -11,45 +11,62 @@ public class GeneratorSingle : MonoBehaviour
     //JL 4-20: added generation on update
     //JL 4-26-20: added distance checking for wall/platform generation
     //JL 4-28-20: added wall generation and 2nd player platforms
-    //AM 5-08-20: updated original generator script to be for single player\
+    //AM 5-08-20: updated original generator script to be for single player
     //AM 5-16-20: added timer and variable blocks from vs mode
     //AM 5-16-20: updated comments to reflect single player
     //AM 5-16-20: fixed issue where starting block was starting to close
+    //AM 5-27-20: updated private variables to protected so they could be inherited by another class
+    //AM 5-27-20: Added headers and space to make components more readable in the unity editor. 
+    // Added regions to make code more managable in code editor.
 
+
+    #region Field Declarations
+    [Header("BlockLists for block prefabs")]
     //List of prefabs to generate platforms
-    [SerializeField] private List<Transform> blockList;
-    [SerializeField] private List<Transform> rockList;
-    [SerializeField] private List<Transform> iceList;
-    [SerializeField] private List<Transform> currentList;
+    [SerializeField] protected List<Transform> blockList;
+    [SerializeField] protected List<Transform> rockList;
+    [SerializeField] protected List<Transform> iceList;
+    [SerializeField] protected List<Transform> currentList;
+    
     //The starting prefabs
-    [SerializeField] private Transform start;
+    [Space]
+    [Header("Starter Prefabs")]
+    [SerializeField] protected Transform start;
     //The starting walls
-    [SerializeField] private Transform wall;
-    [SerializeField] private Transform middle;
+    [SerializeField] protected Transform wall;
+    [SerializeField] protected Transform middle;
+    
     //The prefabs used to generate walls
-    [SerializeField] private Transform lBlock;
-    [SerializeField] private Transform mBlock;
-    [SerializeField] private Transform lRock;
-    [SerializeField] private Transform mRock;
-    [SerializeField] private Transform lIce;
-    [SerializeField] private Transform mIce;
-    [SerializeField] private Transform left;
-    [SerializeField] private Transform mid;
+    [Space]
+    [Header("Prefabs for generating walls")]
+    [SerializeField] protected Transform lBlock;
+    [SerializeField] protected Transform mBlock;
+    [SerializeField] protected Transform lRock;
+    [SerializeField] protected Transform mRock;
+    [SerializeField] protected Transform lIce;
+    [SerializeField] protected Transform mIce;
+    [SerializeField] protected Transform left;
+    [SerializeField] protected Transform mid;
+    
     //Player
-    [SerializeField] private Transform player;
+    [Space]
+    [Header("Player 1")]
+    [SerializeField] protected Transform player;
 
     //number of block immediately generated
-    private int init = 2;
+    protected int init = 2;
 
     //end positions of each of the 3 block types (p1, 2 walls)
-    private Vector3 endPos;
-    private Vector3 endWall;
-    private Vector3 endMid;
+    protected Vector3 endPos;
+    protected Vector3 endWall;
+    protected Vector3 endMid;
 
     //variables tracking and concerning game length
     public int currentTime, interval = 13, stage = 1, counter = 0;
+    #endregion
 
-    private void Awake()
+    #region Unity Event Methods/Functions
+    protected void Awake()
     {
         //finds the end positions of the starting block
         endPos = start.Find("End").position+ new Vector3(0, 2);
@@ -85,8 +102,9 @@ public class GeneratorSingle : MonoBehaviour
             generateWall();
         }
     }
+    #endregion
 
-    
+    #region Methods/Functions
     //generates new walls and grabs the new end points
     private void generateWall()
     {
@@ -114,7 +132,7 @@ public class GeneratorSingle : MonoBehaviour
     }
 
     //instantiates and returns the new platform
-    private Transform generateBlock(Transform block, Vector3 position)
+    protected Transform generateBlock(Transform block, Vector3 position)
     {
         Transform nextPart;
         nextPart = Instantiate(block, position, Quaternion.identity);
@@ -122,7 +140,7 @@ public class GeneratorSingle : MonoBehaviour
     }
     
     //generates new platforms and grabs the new end points
-    private void generateBlock()
+    protected void generateBlock()
     {
         if (stage == 1)
         {
@@ -140,4 +158,5 @@ public class GeneratorSingle : MonoBehaviour
         Transform nextPart = generateBlock(chosen, endPos);
         endPos = nextPart.Find("End").position + new Vector3(0, 6);
     }
+    #endregion
 }

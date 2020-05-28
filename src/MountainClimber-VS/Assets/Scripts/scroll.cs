@@ -4,18 +4,21 @@
 // JL 05-08-2020: Implemented the ability for the cameras to speedup
 // JV 04-28-2020: Modified code so its applicable to all camera objects
 // JL 03-20-2020: Created, now allows cameras to scroll at a constant rate
+// AM 05-27-2020: There was no need for the Animator to be public
 using UnityEngine;
 using TMPro;
 
 public class scroll : MonoBehaviour
 {
+    #region Field Declarations
     public Transform t;
     public float speed = .01f, inc = .01f;
     public int currentTime, interval = 13;
 
     public TextMeshProUGUI speedup;
-    public Animator anim;
+    private Animator anim;
     public int cam;
+    #endregion
 
     void Start()
     {

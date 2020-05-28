@@ -1,5 +1,6 @@
 // GameManager.cs - This controls the camera motion. It's also the score keeping logic and the crate generation and countdown.
-// Maintained by: Juan Villasenor
+// Maintained by: Juan Villasenor - Antonio-Angel Medel as of 05-27-2020
+// AM: 05-27-2020: Added inheritance to reduce duplicate code
 // JV: 05-15-2020: Added background disable for both child cameras
 // JV: 05-08-2020: Added speedup animation play upon camera speedup
 // JV: 05-03-2020: Added countdown with animation
@@ -15,65 +16,38 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
-public class GameManager : MonoBehaviour
+public class GameManager : GameManagerSingle
 {
+    #region Field Declarations
     // References player objects
-    public GameObject player1;
+    [Space]
+    [Header("Referance to Player 2 Object")]
     public GameObject player2;
 
     // Scores
-    public int p1Score = 0;
+    [Space]
+    [Header("Player 2 Scores")]
     public int p2Score = 0;
     // Bonus Scores from breaking crates
-    public int p1BonusScore = 0;
     public int p2BonusScore = 0;
+    // keeping track of the loser
     private string loser;
 
     // References main camera
-    public Camera main_cam;
+    [Space]
+    [Header("References to Both Player Cameras")]
     public Camera cam1; // Player 1
     public Camera cam2; // Player 2
-    public float starting_speed = 0.01f;
-
-    // Score offset
-    public const float scoreOffset = 5.6f;
-
-    // Max distance player can be from cam before being considered out of bounds
-    public const float verticalMaxDist = 18.2f;
-    public const float horizontalMaxDist = 13.0f;
 
     // UI Mechanics
-    public float secondsTilRestart = 2f;
-    public TextMeshProUGUI score1;
+    [Space]
+    [Header("UI Mechanics for player 2")]
     public TextMeshProUGUI score2;
-    public TextMeshProUGUI countdown;
-    public GameObject gameover_ui;
-    public TextMeshProUGUI gameover_text;
-    string[] gameover_displays = new string[4] { "Gameover!\nOOOFFFF", "Gameover!\nBetter luck next time :O\n", "!gAmeOVer?\n", "At least you tried :)\n" };
-    int show;
-    private bool gameover;
-    public TextMeshProUGUI speedup1;
     public TextMeshProUGUI speedup2;
-    public Canvas bg1;
     public Canvas bg2;
+    #endregion
 
-    // Countdown
-    public float counter = 3f;
-    float count_time;
-    bool rearranged = false;
-
-    // Crate generation
-    [SerializeField] public Transform crate;
-    public int chance = 500;
-    private GameObject[] ground;
-    private float crate_offsety = 0.1f;
-    private float crate_offsetx = 1.0f;
-    private int total;
-    public int max_crates = 5;
-
-    // Power up
-    public float min_scroll_speed = 0.01f;
-
+    #region Unity Event Methods
     void Start()
     {
         // Get stuff ready
@@ -306,7 +280,9 @@ public class GameManager : MonoBehaviour
             }
         }
     }
+    #endregion
 
+    #region Methods
     IEnumerator DelayTilRestart()
     {
         main_cam.enabled = true;
@@ -333,4 +309,5 @@ public class GameManager : MonoBehaviour
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+    #endregion
 }
