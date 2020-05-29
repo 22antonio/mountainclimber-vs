@@ -75,7 +75,7 @@ public class GameManagerSingle : MonoBehaviour
     #endregion
 
     #region Unity Event Methods
-    void Start()
+    protected virtual void Start()
     {
         // Get stuff ready
         score1.enabled = true;
@@ -93,7 +93,23 @@ public class GameManagerSingle : MonoBehaviour
         total = crates.Length;
     }
 
-    void Update()
+    protected void Update()
+    {
+        Countdown();
+        UpdateScore();
+        PlayerOutOfBounds();
+        CheckPowerUp();
+        /* Super Jump is handled in player's power up script */
+        // Generate a crate
+        GenerateCrate();
+        CrateCleanUp();
+    }
+    #endregion
+
+    #region Methods
+
+    #region Game Setup
+    protected virtual void Countdown()
     {
         // Countdown
         if (count_time > 1)
@@ -121,7 +137,10 @@ public class GameManagerSingle : MonoBehaviour
                 rearranged = true;
             }
         }
-        
+    }
+
+    protected virtual void UpdateScore()
+    {
         // Update scores every frame
         int new_player1_score = (int)(player1.transform.position.y - scoreOffset);
         if (new_player1_score > p1Score)
@@ -129,7 +148,17 @@ public class GameManagerSingle : MonoBehaviour
             p1Score = new_player1_score;
         }
 
+        // Players broke crates, reward with bonus points
+        if (player1.GetComponent<Powerup>().CheckBonus())
+        {
+            p1BonusScore += 10;
+        }
 
+        score1.text = "Score: " + (p1Score + p1BonusScore);
+    }
+
+    protected virtual void PlayerOutOfBounds()
+    {
         // Player 1
         float xdist = Mathf.Abs(player1.transform.position.x - main_cam.transform.position.x);
 
@@ -145,34 +174,28 @@ public class GameManagerSingle : MonoBehaviour
 
             StartCoroutine(DelayTilRestart());
         }
+    }
 
-
-        // Players broke crates, reward with bonus points
-        if (player1.GetComponent<Powerup>().CheckBonus())
-        {
-            p1BonusScore += 10;
-        }
-
-        score1.text = "Score: " + (p1Score + p1BonusScore);
-
+    protected virtual void CheckPowerUp()
+    {
         // AM 05-08-20: Check at a later point to implement power ups in single player
         // AM 05-16-20: Added power up's for single player
         // Check if either player picked up a powerup
-       if(player1.GetComponent<Powerup>().CheckCamSlowdown())
+        if (player1.GetComponent<Powerup>().CheckCamSlowdown())
         {
             // Slow down player 1's cam
-            if(!(main_cam.GetComponent<scroll>().speed - 0.01f <= min_scroll_speed))
+            if (!(main_cam.GetComponent<scroll>().speed - 0.01f <= min_scroll_speed))
             {
                 //Debug.Log("Slowing down player 1 cam");
                 speedup1.GetComponent<Animator>().Play("Speedup");
                 main_cam.GetComponent<scroll>().speed -= 0.01f;
             }
         }
+    }
 
-        /* Super Jump is handled in player's power up script */
-        // Generate a crate
-
-        // Crate for player 1
+    // Generate Crate for Player 1
+    protected virtual void GenerateCrate()
+    {
         int selected = Random.Range(0, chance);
         if (selected == 1 && total < max_crates)
         {
@@ -199,7 +222,10 @@ public class GameManagerSingle : MonoBehaviour
             Transform new_crate = Instantiate(crate, pos, Quaternion.identity);
             total++;
         }
+    }
 
+    protected virtual void CrateCleanUp()
+    {
         // Clean up old crates
         GameObject[] crates = GameObject.FindGameObjectsWithTag("Crate");
         total = crates.Length;
@@ -216,8 +242,7 @@ public class GameManagerSingle : MonoBehaviour
     }
     #endregion
 
-    #region Methods
-    IEnumerator DelayTilRestart()
+    protected virtual IEnumerator DelayTilRestart()
     {
         if(!gameover)
         {
@@ -237,7 +262,7 @@ public class GameManagerSingle : MonoBehaviour
         RestartScene();
     }
 
-    public void RestartScene()
+    protected void RestartScene()
     {
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }

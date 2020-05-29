@@ -1,4 +1,5 @@
 ﻿// UIManagerSingle.cs - is a derivative of the original UIManager script that is altered for single player. 
+// AM 05-28-20: This is now the base class to control game pause menu
 // This controls the pause menu. It controls taking input from the user to activate the pause menu and pause all objects including cameras.
 // Pause menu allows you to resume play from the moment the player stopped, Restart the level or exit to the main menu.
 // Maintained by: Antonio-Angel Medel
@@ -12,11 +13,11 @@ using UnityEngine.SceneManagement;
 // AM 05-16-20 updated showPaused() & hidePaused() to get main camera instead of player 1 camera, because we moved scroll to main camera
 public class UIManagerSingle : MonoBehaviour
 {
-    GameObject[] pauseObjects;
+    protected GameObject[] pauseObjects;
     public GameManagerSingle gameManagerSingle;
 
     // Start is called before the first frame update
-    void Start()
+    protected void Start()
     {
         Time.timeScale = 1;
         pauseObjects = GameObject.FindGameObjectsWithTag("ShowOnPause");
@@ -24,24 +25,30 @@ public class UIManagerSingle : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    protected void Update()
     {
         // AM - 05-08-20 the p button will pause and unpause the game
         if (Input.GetKeyDown(KeyCode.P))
         {
-            if (Time.timeScale == 1)
-            {
-                Time.timeScale = 0;
-                showPaused();
-            }
-            else if (Time.timeScale == 0)
-            {
-                Debug.Log("high");
-                Time.timeScale = 1;
-                hidePaused();
-            }
+            PauseLogic();
         }
 
+    }
+
+    // AM 05-28-2020: PauseLogic() pauses the game by checking the time scale and shows the menu if needed.
+    private void PauseLogic()
+    {
+        if (Time.timeScale == 1)
+        {
+            Time.timeScale = 0;
+            showPaused();
+        }
+        else if (Time.timeScale == 0)
+        {
+            Debug.Log("high");
+            Time.timeScale = 1;
+            hidePaused();
+        }
     }
 
 
@@ -71,7 +78,7 @@ public class UIManagerSingle : MonoBehaviour
 
     // AM - 05-08-20 hidePaused() will hide the pause menu by
     // setting to false all the objects with the showOnpause tag
-    public void hidePaused()
+    protected virtual void hidePaused()
     {
         foreach (GameObject g in pauseObjects)
         {
@@ -89,7 +96,7 @@ public class UIManagerSingle : MonoBehaviour
 
     // AM - 05-08-20 showPaused() will show the pause menu by setting
     // to true all the objects with the showOnPause tag
-    public void showPaused()
+    protected virtual void showPaused()
     {
         foreach (GameObject g in pauseObjects)
         {
@@ -105,7 +112,7 @@ public class UIManagerSingle : MonoBehaviour
         }
     }
 
-    public void LoadLevel(string level)
+    protected virtual void LoadLevel(string level)
     {
         SceneManager.LoadScene(level);
     }
