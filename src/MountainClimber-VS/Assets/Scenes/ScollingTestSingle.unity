@@ -619,7 +619,6 @@ MonoBehaviour:
   currentTime: 0
   interval: 13
   speedup: {fileID: 2052951295}
-  anim: {fileID: 0}
   cam: 0
 --- !u!1001 &178625959
 PrefabInstance:
@@ -3226,7 +3225,7 @@ MonoBehaviour:
   gameover_ui: {fileID: 371157216}
   gameover_text: {fileID: 72966314}
   speedup1: {fileID: 2052951295}
-  Bg1: {fileID: 1604628070}
+  bg1: {fileID: 1604628070}
   counter: 3
   crate: {fileID: 8490226941351730247, guid: d4545bb9715426a45a7dd499ec69dbc8, type: 3}
   chance: 500

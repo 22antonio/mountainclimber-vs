@@ -66,7 +66,7 @@ public class GeneratorSingle : MonoBehaviour
     #endregion
 
     #region Unity Event Methods/Functions
-    protected void Awake()
+    protected virtual void Awake()
     {
         //finds the end positions of the starting block
         endPos = start.Find("End").position+ new Vector3(0, 2);
@@ -81,7 +81,7 @@ public class GeneratorSingle : MonoBehaviour
     }
     
     //checks player location relative to current end points and generate walls/platforms accordingly
-    private void Update()
+    protected virtual void Update()
     {
         currentTime = (int)Time.timeSinceLevelLoad;
         if (counter > 3)
@@ -106,7 +106,7 @@ public class GeneratorSingle : MonoBehaviour
 
     #region Methods/Functions
     //generates new walls and grabs the new end points
-    private void generateWall()
+    protected virtual void generateWall()
     {
         if (stage == 1)
         {
@@ -140,7 +140,7 @@ public class GeneratorSingle : MonoBehaviour
     }
     
     //generates new platforms and grabs the new end points
-    protected void generateBlock()
+    protected virtual void generateBlock()
     {
         if (stage == 1)
         {

@@ -16,6 +16,8 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using TMPro;
+using System.Security.Principal;
+
 public class GameManager : GameManagerSingle
 {
     #region Field Declarations
@@ -48,7 +50,7 @@ public class GameManager : GameManagerSingle
     #endregion
 
     #region Unity Event Methods
-    void Start()
+    protected override void Start()
     {
         // Get stuff ready
         score1.enabled = true;
@@ -72,8 +74,12 @@ public class GameManager : GameManagerSingle
         GameObject[] crates = GameObject.FindGameObjectsWithTag("Crate");
         total = crates.Length;
     }
+    #endregion
 
-    void Update()
+    #region Methods
+
+    #region Game Setup 
+    protected override void Countdown()
     {
         // Countdown
         if (count_time > 1)
@@ -106,7 +112,10 @@ public class GameManager : GameManagerSingle
                 rearranged = true;
             }
         }
-        
+    }
+
+    protected override void UpdateScore()
+    {
         // Update scores every frame
         int new_player1_score = (int)(player1.transform.position.y - scoreOffset);
         if (new_player1_score > p1Score)
@@ -117,6 +126,23 @@ public class GameManager : GameManagerSingle
         int new_p2Score = (int)(player2.transform.position.y - scoreOffset);
         if (new_p2Score > p2Score) p2Score = new_p2Score;
 
+        // Players broke crates, reward with bonus points
+        if (player1.GetComponent<Powerup>().CheckBonus())
+        {
+            p1BonusScore += 10;
+        }
+
+        if (player2.GetComponent<Powerup>().CheckBonus())
+        {
+            p2BonusScore += 10;
+        }
+
+        score1.text = "Score: " + (p1Score + p1BonusScore);
+        score2.text = "Score: " + (p2Score + p2BonusScore);
+    }
+
+    protected override void PlayerOutOfBounds()
+    {
         // Player 1
         float xdist = Mathf.Abs(player1.transform.position.x - cam1.transform.position.x);
 
@@ -156,33 +182,23 @@ public class GameManager : GameManagerSingle
 
             StartCoroutine(DelayTilRestart());
         }
+    }
 
-        // Players broke crates, reward with bonus points
-        if (player1.GetComponent<Powerup>().CheckBonus())
-        {
-            p1BonusScore += 10;
-        }
-
-        if (player2.GetComponent<Powerup>().CheckBonus())
-        {
-            p2BonusScore += 10;
-        }
-
-        score1.text = "Score: " + (p1Score + p1BonusScore);
-        score2.text = "Score: " + (p2Score + p2BonusScore);
-
+    protected override void CheckPowerUp()
+    {
         // Check if either player picked up a powerup
-        if(player1.GetComponent<Powerup>().CheckEnemySpeedup())
+        if (player1.GetComponent<Powerup>().CheckEnemySpeedup())
         {
             // Speed up player 2's cam
             Debug.Log("Speeding up player 2 cam");
             speedup2.GetComponent<Animator>().enabled = true;
             speedup2.GetComponent<Animator>().Play("Speedup2", -1, 0);
             cam2.GetComponent<scroll>().speed += 0.01f;
-        } else if(player1.GetComponent<Powerup>().CheckCamSlowdown())
+        }
+        else if (player1.GetComponent<Powerup>().CheckCamSlowdown())
         {
             // Slow down player 1's cam
-            if(!(cam1.GetComponent<scroll>().speed - 0.01f <= min_scroll_speed))
+            if (!(cam1.GetComponent<scroll>().speed - 0.01f <= min_scroll_speed))
             {
                 Debug.Log("Slowing down player 1 cam");
                 speedup1.GetComponent<Animator>().Play("Speedup");
@@ -190,14 +206,15 @@ public class GameManager : GameManagerSingle
             }
         }
 
-        if(player2.GetComponent<Powerup>().CheckEnemySpeedup())
+        if (player2.GetComponent<Powerup>().CheckEnemySpeedup())
         {
             // Speed up player 1's cam
             Debug.Log("Speeding up player 1 cam");
             speedup1.GetComponent<Animator>().enabled = true;
             speedup1.GetComponent<Animator>().Play("Speedup", -1, 0);
             cam1.GetComponent<scroll>().speed += 0.01f;
-        } else if(player2.GetComponent<Powerup>().CheckCamSlowdown())
+        }
+        else if (player2.GetComponent<Powerup>().CheckCamSlowdown())
         {
             // Slow down player 2's cam
             if (!(cam2.GetComponent<scroll>().speed - 0.01f <= min_scroll_speed))
@@ -206,9 +223,10 @@ public class GameManager : GameManagerSingle
                 cam2.GetComponent<scroll>().speed -= 0.01f;
             }
         }
+    }
 
-        /* Super Jump is handled in player's power up script */
-        
+    protected override void GenerateCrate()
+    {
         // Generate a crate
 
         // Crate for player 1
@@ -221,12 +239,12 @@ public class GameManager : GameManagerSingle
             float maxy = cam1.transform.position.y + (2 * verticalMaxDist);
             ground = GameObject.FindGameObjectsWithTag("Ground");
             int i;
-            for(i = 0; i<ground.Length; i++)
+            for (i = 0; i < ground.Length; i++)
             {
                 // Find good position to place crate
                 float xpos = ground[i].transform.position.x;
                 float ypos = ground[i].transform.position.y;
-                if(xpos > minx && xpos < maxx && ypos > miny && ypos < maxy)
+                if (xpos > minx && xpos < maxx && ypos > miny && ypos < maxy)
                 {
                     break;
                 }
@@ -239,7 +257,7 @@ public class GameManager : GameManagerSingle
             total++;
         }
         // Crate for player 2
-        else if(selected == 2 && total < max_crates)
+        else if (selected == 2 && total < max_crates)
         {
             float minx = cam2.transform.position.x - horizontalMaxDist;
             float maxx = cam2.transform.position.x + horizontalMaxDist;
@@ -264,16 +282,19 @@ public class GameManager : GameManagerSingle
             Transform new_crate = Instantiate(crate, pos, Quaternion.identity);
             total++;
         }
+    }
 
+    protected override void CrateCleanUp()
+    {
         // Clean up old crates
         GameObject[] crates = GameObject.FindGameObjectsWithTag("Crate");
         total = crates.Length;
-        for(int i=0; i<crates.Length; i++)
+        for (int i = 0; i < crates.Length; i++)
         {
             float c1y = cam1.transform.position.y;
             float c2y = cam2.transform.position.y;
             float cratey = crates[i].transform.position.y;
-            if(cratey < c1y-verticalMaxDist && cratey < c2y-verticalMaxDist)
+            if (cratey < c1y - verticalMaxDist && cratey < c2y - verticalMaxDist)
             {
                 Destroy(crates[i]);
                 total--;
@@ -282,8 +303,7 @@ public class GameManager : GameManagerSingle
     }
     #endregion
 
-    #region Methods
-    IEnumerator DelayTilRestart()
+    protected override IEnumerator DelayTilRestart()
     {
         main_cam.enabled = true;
         if(!gameover)
@@ -303,11 +323,6 @@ public class GameManager : GameManagerSingle
 
         // Restart the scene
         RestartScene();
-    }
-
-    public void RestartScene()
-    {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
     #endregion
 }

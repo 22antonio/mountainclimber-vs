@@ -55,7 +55,7 @@ public class GeneratorDouble : GeneratorSingle
     #endregion
 
     #region Unity Event Methods/Functions
-    private void Awake()
+    protected override void Awake()
     {
         //Finds the settingsmanager object and its 'uniqueOn' variable
         settings = GameObject.Find("SettingsManager");
@@ -69,7 +69,7 @@ public class GeneratorDouble : GeneratorSingle
     }
 
     //checks player locations relative to current end points and generate walls/platforms accordingly
-    private void Update()
+    protected override void Update()
     {
         currentTime = (int)Time.timeSinceLevelLoad;
         if(counter > 3)
@@ -94,7 +94,7 @@ public class GeneratorDouble : GeneratorSingle
 
     #region Methods/Functions
     //generates new walls and grabs the new end points
-    private void generateWall()
+    protected override void generateWall()
     {
         if (stage == 1)
         {
@@ -127,7 +127,7 @@ public class GeneratorDouble : GeneratorSingle
 
     //generates new platforms and grabs the new end points
     // changed to call from base class as to reduce on rewritten code
-    private void generateBlock()
+    protected override void generateBlock()
     {
         base.generateBlock();
 
